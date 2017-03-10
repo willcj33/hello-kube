@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: color-requestor
+  name: color-requestor
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: color-requestor
+    spec:
+      containers:
+      - image: color-requestor:local-dev
+        name: color-requestor
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 50051
+          name: grpc-server

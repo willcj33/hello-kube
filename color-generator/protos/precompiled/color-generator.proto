@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package colorgen;
+
+service ColorGeneratorService {
+ rpc GetColor (Empty) returns (Color) {}
+}
+message Color {
+    string hex = 1;
+}
+message Empty{}

@@ -1,0 +1,8 @@
+FROM billyteves/alpine-golang-glide
+
+ADD ./bin/color-generator /
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
+
+CMD [ "/color-generator" ]

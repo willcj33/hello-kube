@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: color-generator
+  name: color-generator
+spec:
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        name: color-generator
+    spec:
+      containers:
+      - image: color-generator:local-dev
+        imagePullPolicy: Never
+        name: color-generator
+        ports:
+        - containerPort: 50051
+          name: grpc-server
