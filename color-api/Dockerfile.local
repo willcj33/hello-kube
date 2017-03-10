@@ -1,0 +1,8 @@
+FROM alpine:3.5
+
+ADD ./bin/color-api /
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
+
+CMD [ "/color-api" ]

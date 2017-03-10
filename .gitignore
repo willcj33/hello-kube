@@ -1,9 +1,11 @@
 color-requestor/bin
 color-generator/bin
+color-api/bin
 
 color-requestor/vendor
 color-generator/vendor
+color-api/vendor
 
 color-requestor/glide.lock
 color-generator/glide.lock
- 
+color-api/glide.lock
