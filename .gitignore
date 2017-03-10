@@ -3,3 +3,7 @@ color-generator/bin
 
 color-requestor/vendor
 color-generator/vendor
+
+color-requestor/glide.lock
+color-generator/glide.lock
+ 
