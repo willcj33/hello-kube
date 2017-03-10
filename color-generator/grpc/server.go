@@ -1,9 +1,12 @@
 package server
 
 import (
+	"fmt"
 	"log"
+	"math/rand"
+	"strconv"
+	"time"
 
-	colorUtil "github.com/lucasb-eyer/go-colorful"
 	pb "github.com/willcj33/hello-kube/color-generator/protos"
 	context "golang.org/x/net/context"
 )
@@ -15,10 +18,11 @@ type ColorGeneratorServer struct{}
 
 // GetColor gets a random color
 func (s *ColorGeneratorServer) GetColor(ctx context.Context, empty *pb.Empty) (*pb.Color, error) {
-	currentColor := colorUtil.FastHappyColor()
-	log.Printf("Color: %v\n", currentColor.Hex())
+	rand.Seed(time.Now().UTC().UnixNano())
+	h := fmt.Sprintf("%v%v%v", strconv.FormatInt(rand.Int63n(256), 16), strconv.FormatInt(rand.Int63n(256), 16), strconv.FormatInt(rand.Int63n(256), 16))
+	log.Printf("Color: %v\n", h)
 	return &pb.Color{
-		Hex: currentColor.Hex(),
+		Hex: h,
 	}, nil
 }
 

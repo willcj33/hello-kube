@@ -7,6 +7,7 @@ import (
 
 	"golang.org/x/net/context"
 
+	"github.com/sercand/kuberesolver"
 	pb "github.com/willcj33/hello-kube/color-requestor/protos"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
@@ -15,7 +16,8 @@ import (
 var forever = make(chan struct{})
 
 func main() {
-	conn, err := grpc.Dial("color-generator:50051", grpc.WithInsecure())
+	balancer := kuberesolver.New()
+	conn, err := balancer.Dial("kubernetes://color-generator:50051", grpc.WithInsecure())
 	if err != nil {
 		grpclog.Fatalf("fail to dial: %v", err)
 	}
@@ -30,7 +32,7 @@ func main() {
 				color, err := client.GetColor(context.Background(), &pb.Empty{})
 				if err != nil {
 					log.Println(err)
-					return
+					break
 				}
 				log.Printf("Color: %v\n", color.Hex)
 			case <-quit:
