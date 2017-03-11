@@ -2,28 +2,33 @@ package main
 
 // Import packages
 import (
+	"flag"
 	"log"
-	"time"
+	"net/http"
 
-	"golang.org/x/net/context"
+	"strings"
 
-	"github.com/sercand/kuberesolver"
-	pb "github.com/willcj33/hello-kube/color-requestor/protos"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/grpclog"
+	grpcHandler "github.com/willcj33/hello-kube/color-requestor/grpcHandler"
+	socket "github.com/willcj33/hello-kube/color-requestor/socket"
 )
 
 var forever = make(chan struct{})
 
 func main() {
-	balancer := kuberesolver.New()
-	conn, err := balancer.Dial("kubernetes://color-generator:50051", grpc.WithInsecure())
+	flag.Parse()
+	hub := socket.NewHub()
+	go hub.Run()
+	http.HandleFunc("/", renderIndexPage)
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		socket.SocketHandler(hub, w, r)
+	})
+	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
-		grpclog.Fatalf("fail to dial: %v", err)
+		log.Fatal("ListenAndServe: ", err)
 	}
-	defer conn.Close()
-	client := pb.NewColorGeneratorServiceClient(conn)
-	tickerLoad := time.NewTicker(10 * time.Second)
+	grpcHandler.Init()
+
+	/*tickerLoad := time.NewTicker(10 * time.Second)
 	quit := make(chan struct{})
 	go func() {
 		for {
@@ -39,6 +44,22 @@ func main() {
 				tickerLoad.Stop()
 			}
 		}
-	}()
+	}()*/
 	<-forever
+}
+
+func renderIndexPage(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL.Path)
+
+	if strings.TrimSpace(r.URL.Path) != "/" {
+		http.Error(w, "Not found", 404)
+		log.Println("in 404")
+		return
+	}
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", 405)
+		return
+	}
+	log.Println(r.URL.Query())
+	http.ServeFile(w, r, "index.html")
 }

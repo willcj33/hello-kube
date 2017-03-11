@@ -5,8 +5,10 @@ metadata:
   labels:
     name: color-requestor
 spec:
+  type: LoadBalancer
   ports:
-  - port: 50051
-    targetPort: 50051
+  - name: socket-server
+    port: 8080
+    targetPort: 8080
   selector:
     name: color-requestor
