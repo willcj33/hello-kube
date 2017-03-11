@@ -5,7 +5,7 @@ metadata:
     name: color-generator
   name: color-generator
 spec:
-  replicas: 4
+  replicas: 10
   template:
     metadata:
       labels:

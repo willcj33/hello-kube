@@ -5,7 +5,7 @@ metadata:
     name: color-requestor
   name: color-requestor
 spec:
-  replicas: 2
+  replicas: 6
   template:
     metadata:
       labels:

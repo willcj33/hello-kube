@@ -10,37 +10,49 @@ window.onload = function () {
 
     if (window["WebSocket"]) {
         var count = getParameterByName("count") || 1;
-        var interval = getParameterByName("interval") || 5;
-        if (!count || !count.trim().length){
-            count = 1;
-        }
-        if (!interval || !interval.trim().length){
-            interval = 1;
-        }
+        var interval = getParameterByName("interval") || 5000;
         conn = new WebSocket("ws://" + document.location.host + "/ws?interval=" + interval + "&count=" + count);
         conn.onclose = function (evt) {
             var item = document.createElement("div");
             item.innerHTML = "<b>Connection closed.</b>";
-            appendLog(item);
         };
-        conn.onmessage = function (evt) {
-            var messages = evt.data.split('\n');
-            for (var i = 0; i < messages.length; i++) {
+        var rowCount = 1;
+        if (count > 10){
+            rowCount = Math.ceil(count/10);
+        }
+        var rowHolder = [];
+        var rowAgg = 0;
+        for (var i =0; i < count; i++){
+            if (rowAgg === 0){
+                rowHolder.push([]);
+            }
+            rowHolder[rowHolder.length - 1][rowAgg++] = i;
+            if (rowAgg === 9){
+                rowAgg = 0;
+            }
+        }
+        for (var ri = 0; ri < rowHolder.length; ri++){
+            var rowLen = rowHolder[ri].length;
+            for (var i = 0; i < rowHolder[ri].length; i++){
                 var item = document.createElement("div");
-                item.innerText = messages[i];
-                appendLog(item);
+                item.id = "childDiv_"+rowHolder[ri][i];
+                item.className = 'color-div';
+                item.style.width = (100/rowLen) + '%';
+                item.style.height = (100/rowCount) + '%';
+                document.getElementById('color-container').appendChild(item);
+            }
+        }
+        conn.onmessage = function (evt) {
+            var data = JSON.parse(evt.data);
+            if (data.which >= 0){
+                item = document.getElementById("childDiv_"+ data.which);
+                item.style.backgroundColor = "#" + data.color;
             }
         };
-
-        for (var i =0; i < count; i++){
-            var item = document.createElement("div");
-            item.className = 'color-div';
-            document.getElementById('color-container').appendChild(item);
-        }
+       
     } else {
         var item = document.createElement("div");
         item.innerHTML = "<b>Your browser does not support WebSockets.</b>";
-        appendLog(item);
     }
 };
 
@@ -87,14 +99,12 @@ body {
     height: 100vh;
     width: 100vw;
     float: left;
-    background: green;
+    background: white;
 }
 
 .color-div {
-    height: 100px;
-    width: 100px;
     float: left;
-    background: blue;
+    background: black;
 }
 
 </style>

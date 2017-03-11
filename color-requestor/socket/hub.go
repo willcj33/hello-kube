@@ -1,5 +1,9 @@
 package socket
 
+import (
+	pb "github.com/willcj33/hello-kube/color-requestor/protos"
+)
+
 // hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
@@ -7,14 +11,16 @@ type Hub struct {
 	sendMessage chan []byte
 	add         chan *Client
 	remove      chan *Client
+	grpcClient  pb.ColorGeneratorServiceClient
 }
 
-func NewHub() *Hub {
+func NewHub(gClient pb.ColorGeneratorServiceClient) *Hub {
 	return &Hub{
 		sendMessage: make(chan []byte),
 		add:         make(chan *Client),
 		remove:      make(chan *Client),
 		clients:     make(map[*Client]bool),
+		grpcClient:  gClient,
 	}
 }
 

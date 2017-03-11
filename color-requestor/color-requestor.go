@@ -8,7 +8,7 @@ import (
 
 	"strings"
 
-	grpcHandler "github.com/willcj33/hello-kube/color-requestor/grpcHandler"
+	"github.com/willcj33/hello-kube/color-requestor/grpcHandler"
 	socket "github.com/willcj33/hello-kube/color-requestor/socket"
 )
 
@@ -16,7 +16,9 @@ var forever = make(chan struct{})
 
 func main() {
 	flag.Parse()
-	hub := socket.NewHub()
+	grpcClient, conn := grpcHandler.NewClient()
+	defer conn.Close()
+	hub := socket.NewHub(grpcClient)
 	go hub.Run()
 	http.HandleFunc("/", renderIndexPage)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +28,6 @@ func main() {
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
-	grpcHandler.Init()
 
 	/*tickerLoad := time.NewTicker(10 * time.Second)
 	quit := make(chan struct{})
@@ -60,6 +61,5 @@ func renderIndexPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", 405)
 		return
 	}
-	log.Println(r.URL.Query())
 	http.ServeFile(w, r, "index.html")
 }
