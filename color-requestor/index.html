@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Cray Cray Colors</title>
+<script type="text/javascript">
+window.onload = function () {
+    var conn;
+    var msg = document.getElementById("msg");
+    var log = document.getElementById("log");
+
+    if (window["WebSocket"]) {
+        var count = getParameterByName("count") || 1;
+        var interval = getParameterByName("interval") || 5000;
+        conn = new WebSocket("ws://" + document.location.host + "/ws?interval=" + interval + "&count=" + count);
+        conn.onclose = function (evt) {
+            var item = document.createElement("div");
+            item.innerHTML = "<b>Connection closed.</b>";
+        };
+        var rowCount = 1;
+        if (count > 10){
+            rowCount = Math.ceil(count/10);
+        }
+        var rowHolder = [];
+        var rowAgg = 0;
+        for (var i =0; i < count; i++){
+            if (rowAgg === 0){
+                rowHolder.push([]);
+            }
+            rowHolder[rowHolder.length - 1][rowAgg++] = i;
+            if (rowAgg === 9){
+                rowAgg = 0;
+            }
+        }
+        for (var ri = 0; ri < rowHolder.length; ri++){
+            var rowLen = rowHolder[ri].length;
+            for (var i = 0; i < rowHolder[ri].length; i++){
+                var item = document.createElement("div");
+                item.id = "childDiv_"+rowHolder[ri][i];
+                item.className = 'color-div';
+                item.style.width = (100/rowLen) + '%';
+                item.style.height = (100/rowCount) + '%';
+                document.getElementById('color-container').appendChild(item);
+            }
+        }
+        conn.onmessage = function (evt) {
+            var data = JSON.parse(evt.data);
+            if (data.which >= 0){
+                item = document.getElementById("childDiv_"+ data.which);
+                item.style.backgroundColor = "#" + data.color;
+            }
+        };
+       
+    } else {
+        var item = document.createElement("div");
+        item.innerHTML = "<b>Your browser does not support WebSockets.</b>";
+    }
+};
+
+function getParameterByName(name, url) {
+    if (!url) {
+      url = window.location.href;
+    }
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+</script>
+<style type="text/css">
+html {
+    overflow: hidden;
+}
+
+body {
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background: gray;
+}
+
+#log {
+    background: white;
+    margin: 0;
+    padding: 0.5em 0.5em 0.5em 0.5em;
+    position: absolute;
+    top: 0.5em;
+    left: 0.5em;
+    right: 0.5em;
+    bottom: 3em;
+    overflow: auto;
+}
+
+#color-container {
+    height: 100vh;
+    width: 100vw;
+    float: left;
+    background: white;
+}
+
+.color-div {
+    float: left;
+    background: black;
+}
+
+</style>
+</head>
+<body>
+<div id="color-container"></div>
+</body>
+</html>

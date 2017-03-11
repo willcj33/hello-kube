@@ -2,26 +2,34 @@ package main
 
 // Import packages
 import (
+	"flag"
 	"log"
-	"time"
+	"net/http"
 
-	"golang.org/x/net/context"
+	"strings"
 
-	pb "github.com/willcj33/hello-kube/color-requestor/protos"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/grpclog"
+	"github.com/willcj33/hello-kube/color-requestor/grpcHandler"
+	socket "github.com/willcj33/hello-kube/color-requestor/socket"
 )
 
 var forever = make(chan struct{})
 
 func main() {
-	conn, err := grpc.Dial("color-generator:50051", grpc.WithInsecure())
-	if err != nil {
-		grpclog.Fatalf("fail to dial: %v", err)
-	}
+	flag.Parse()
+	grpcClient, conn := grpcHandler.NewClient()
 	defer conn.Close()
-	client := pb.NewColorGeneratorServiceClient(conn)
-	tickerLoad := time.NewTicker(10 * time.Second)
+	hub := socket.NewHub(grpcClient)
+	go hub.Run()
+	http.HandleFunc("/", renderIndexPage)
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		socket.SocketHandler(hub, w, r)
+	})
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
+
+	/*tickerLoad := time.NewTicker(10 * time.Second)
 	quit := make(chan struct{})
 	go func() {
 		for {
@@ -30,13 +38,28 @@ func main() {
 				color, err := client.GetColor(context.Background(), &pb.Empty{})
 				if err != nil {
 					log.Println(err)
-					return
+					break
 				}
 				log.Printf("Color: %v\n", color.Hex)
 			case <-quit:
 				tickerLoad.Stop()
 			}
 		}
-	}()
+	}()*/
 	<-forever
+}
+
+func renderIndexPage(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL.Path)
+
+	if strings.TrimSpace(r.URL.Path) != "/" {
+		http.Error(w, "Not found", 404)
+		log.Println("in 404")
+		return
+	}
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", 405)
+		return
+	}
+	http.ServeFile(w, r, "index.html")
 }

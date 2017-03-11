@@ -1,7 +1,9 @@
 FROM alpine:3.5
 
+EXPOSE 8080
 ADD ./bin/color-requestor /
 COPY docker-entrypoint.sh /docker-entrypoint.sh
+COPY index.html /index.html
 
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
 
