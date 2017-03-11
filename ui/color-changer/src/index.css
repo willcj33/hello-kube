@@ -1,0 +1,23 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+.row {
+  text-align: center;
+  width: 100%;
+  position: relative;
+  margin-top: 20px;
+  display: block;
+}
+
+.color-tile {
+  height: 144px;
+  width: 144px;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 20px;
+  position: relative;
+  display: inline-block;
+}
