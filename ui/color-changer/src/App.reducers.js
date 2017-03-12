@@ -36,6 +36,7 @@ export default (state = initialState, action) => {
                 },
                 grid: newGrid
             };
+        default:
+            return state;
     }
-    return state;
 };

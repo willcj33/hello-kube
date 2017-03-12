@@ -20,8 +20,8 @@ class App extends Component {
   render() {
     return (
       <div className="container">
-        {this.state.grid.map(r => <div className="row">
-          {r.map(c => <ColorTile id={c.id} color={c.color}></ColorTile>)}
+        {this.state.grid.map((r, index) => <div key={index} className="row">
+          {r.map(c => <ColorTile key={c.id} id={c.id} color={c.color}></ColorTile>)}
         </div>)}
       </div>
     );

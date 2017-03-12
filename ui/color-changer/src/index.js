@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import mdc from './mockDataChanger'
+//import mdc from './mockDataChanger'
+import './wsDataChanger'
 import './index.css';
 
 ReactDOM.render(
