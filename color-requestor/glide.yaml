@@ -7,6 +7,5 @@ import:
 - package: google.golang.org/grpc
 - package: github.com/golang/protobuf/proto
 - package: golang.org/x/net
-  version: 6acef71eb69611914f7a30939ea9f6e194c78172
 - package: github.com/sercand/kuberesolver
 - package: github.com/gorilla/websocket

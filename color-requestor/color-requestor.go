@@ -8,8 +8,6 @@ import (
 
 	"strings"
 
-	personProto "charlotte/common/person/v1"
-
 	"github.com/willcj33/hello-kube/color-requestor/grpcHandler"
 	socket "github.com/willcj33/hello-kube/color-requestor/socket"
 )
@@ -30,8 +28,6 @@ func main() {
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
-
-	newthing = personProto.Person{}
 
 	/*tickerLoad := time.NewTicker(10 * time.Second)
 	quit := make(chan struct{})
