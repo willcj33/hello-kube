@@ -124,7 +124,6 @@ glide:
 		$(GLIDE_CLEAN_AND_INSTALL); \
 	done
 	cp -rf ./proto/* ./vendor
-	rm -rf ./proto/
 
 
 glide-pre-fetch:

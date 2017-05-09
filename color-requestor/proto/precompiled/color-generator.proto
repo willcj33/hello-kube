@@ -1,0 +1,17 @@
+syntax = "proto3";
+package colorgen;
+
+service ColorGeneratorService {
+    rpc GetColor (Empty) returns (Color) {}
+}
+message ColorCollection  {
+    repeated Color values = 1; 
+}
+message Color {
+    string hex = 1;
+}
+message Settings {
+    int32 interval = 1;
+    int32 tileCount = 2;
+}
+message Empty {}
