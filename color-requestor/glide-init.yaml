@@ -1,0 +1,6 @@
+ignore:
+- google
+- charlotte
+import:
+- package: github.com/willcj33/proto-test
+  repo: git@github.com:willcj33/proto-test.git

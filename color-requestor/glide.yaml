@@ -1,4 +1,7 @@
 package: github.com/willcj33/color-requestor
+ignore:
+- google
+- charlotte
 import:
 - package: github.com/grpc/grpc-go
 - package: google.golang.org/grpc

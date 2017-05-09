@@ -26,9 +26,10 @@ PROTOC_CMD=protoc
 PROTOC_GO_OUT=--go_out
 PROTOC_PLUGINS=plugins
 PROTOC_GRPC=grpc
-VENDOR_PROTO_PATH=$(VENDOR_PATH)/protos
-PROTO_LIST=*.proto
-LOCAL_PROTO_PATH=../
+VENDOR_PROTO_PATH=$(VENDOR_PATH)/proto-test
+PROTO_LIST=charlotte/common/traits/person/v1/*.proto charlotte/common/source/v1/*.proto charlotte/common/traits/profile/v1/*.proto charlotte/common/profile/v1/*.proto charlotte/common/person/v1/*.proto
+LOCAL_PROTO_PATH=../../../../proto/
+GLOBAL_PROTO_REPO=github.com/willcj33/proto-test
 
 #GLIDE
 GLIDE_CMD=glide
@@ -44,7 +45,7 @@ VERSION=0.1
 
 .PHONY: all build build-race test test-verbose deps update-deps install clean fmt vet lint
 
-all: protoc glide build test-verbose
+all: glide-pre-fetch protoc glide build test-verbose
 
 build: vet
 	@for p in $(SERVICE_NAME); do \
@@ -122,16 +123,27 @@ glide:
 		echo "==> Glide $$p ..."; \
 		$(GLIDE_CLEAN_AND_INSTALL); \
 	done
+	cp -rf ./proto/* ./vendor
+	rm -rf ./proto/
+
+
+glide-pre-fetch:
+	@for p in $(SERVICE_NAME); do \
+		echo "==> Get Protos $$p ..."; \
+		$(GLIDE_CMD) --yaml glide-init.yaml update && $(GLIDE_CMD) --yaml glide-init.yaml install; \
+	done
+
+protoc: glide-pre-fetch
+	rm -rf ./proto
+	mkdir ./proto
+	@for p in $(PROTO_LIST); do \
+		echo "==> Protoc $$p ..."; \
+		pushd ./$(VENDOR_PROTO_PATH);\
+	    $(PROTOC_CMD) $(PROTOC_GO_OUT)=$(PROTOC_PLUGINS)=$(PROTOC_GRPC):$(LOCAL_PROTO_PATH) $$p;\
+		popd;\
+	done
+
 
 build-docker-local: glide build-linux
 	docker build -f Dockerfile.local -t color-requestor:local-dev .
 	echo "\nDgs color-requestor service built. It is now available to run in minikube.\n"
-
-protoc:
-	@for p in $(PROTO_LIST); do \
-		pushd ./protos/precompiled;\
-		echo "==> Protoc $$p ..."; \
-		$(PROTOC_CMD) $(PROTOC_GO_OUT)=$(PROTOC_PLUGINS)=$(PROTOC_GRPC):$(LOCAL_PROTO_PATH) $$p;\
-		popd;\
-	done
-
